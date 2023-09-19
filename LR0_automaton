@@ -1,0 +1,30 @@
+digraph {
+	0 [label="S -> .E
+E -> .E + T
+E -> .T
+T -> .T*F
+T -> .F" shape=box]
+	0 -> 1 [label=E]
+	1 [label="S -> E." shape=box]
+	2 [label="E -> .E+T
+E -> .T" shape=box]
+	2 -> 3 [label=E]
+	2 -> 2 [label=T]
+	3 [label="E -> E.+T" shape=box]
+	3 -> 4 [label=T]
+	4 [label="E -> E+.T" shape=box]
+	4 -> 5 [label=T]
+	5 [label="T -> .T*F
+T -> .F" shape=box]
+	5 -> 6 [label=T]
+	5 -> 7 [label=F]
+	6 [label="T -> T.*F" shape=box]
+	6 -> 8 [label=F]
+	7 [label="F -> .(E)
+F -> .id" shape=box]
+	7 -> 9 [label=E]
+	7 -> 10 [label=id]
+	8 [label="F -> (E.)" shape=box]
+	9 [label="E -> E+.T." shape=box]
+	10 [label="T -> T.*F." shape=box]
+}
