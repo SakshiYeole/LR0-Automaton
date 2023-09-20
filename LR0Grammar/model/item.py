@@ -1,5 +1,8 @@
 import copy
 
+from model import Grammar as g
+from model import productionRule as ProductionRule
+
 class itemType:
         new_item = "new_item"
         derived_item = "derived_item"
@@ -22,6 +25,11 @@ class Item:
             return None
         indexOfDotMarker = self.RHS.index(self.dotMarker)
         return self.RHS[indexOfDotMarker + 1]
+    
+    def getCorrespondingProductionRuleForReducingItem(self):
+        production_rule = ProductionRule.ProductionRule(self.LHS)
+        production_rule.addRHS(self.RHS)
+        return production_rule
     
     def movingDotMarkerInItemAndReturn(self):
         if self.isReductionItem():
@@ -68,3 +76,23 @@ class Item:
     
     def __hash__(self) -> int:
         return hash((self.LHS, tuple(self.RHS)))
+    
+def main():
+    dotMarker = '\u2022'
+    
+    t = g.Grammar()
+    right = []
+    right.append("(")
+    right.append(dotMarker)
+    right.append("E")
+    right.append(")")
+    i = Item("F", right, itemType.derived_item)
+    print(f"Item: {i}")
+
+    closure = set()
+    closure = i.closure(t.getProductionRules())
+    for i in  closure:
+        print(i)
+
+if __name__ == "__main__":
+    main()

@@ -23,12 +23,15 @@ import shutil
 import subprocess
 from collections import deque
 
+# sys.path.append('E:\Acads\Semester 7\CD\Lab\lab6\model')
 from model import productionRule as pr
 from model import item
 from model import state
-import Grammar
+from model import Grammar
+from model import LR0ParseTableElement
 
 class LR0Grammar(Grammar):
+
     def __init__(self):
         super().__init__()
         self.transitions = {}
@@ -153,44 +156,19 @@ def main():
     t.addNonterminalSymbol("E")
     t.addNonterminalSymbol("T")
     t.addNonterminalSymbol("F")
+
     t.addTerminalSymbol("+")
     t.addTerminalSymbol("*")
     t.addTerminalSymbol("(")
     t.addTerminalSymbol(")")
     t.addTerminalSymbol("F")
-    t.addRule("E' -> E")
+
+    # t.addRule("E' -> E")
     t.addRule("E -> E + T | T")
     t.addRule("T -> T * F | F")
     t.addRule("F -> ( E ) | id")
+
     t.printGrammar()
-
-    # right = []
-    # right.append("(")
-    # right.append(dotMarker)
-    # right.append("E")
-    # right.append(")")
-    # i = Item("F", right, itemType.derived_item)
-    # print(f"Item: {i}")
-
-    # closure = set()
-    # closure = i.closure(t.getProductionRules())
-    # for i in  closure:
-    #     print(i)
-
-    # inititemset = set()
-    # inititemset.add(i)
-
-    # s1 = State(inititemset, t.getProductionRules())
-    # print(s1)
-    # s2 = State(inititemset, t.getProductionRules())
-    # print(s2)
-
-    # print(s1==s2)
-
-    # states = set()
-    # states.add(s1)
-    # states.add(s2)
-    # print(f"states size: {len(states)}")
 
     t.computeTransitions()
     t.printTransitions()
