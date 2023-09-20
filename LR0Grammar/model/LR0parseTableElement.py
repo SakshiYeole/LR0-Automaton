@@ -2,18 +2,23 @@ class LR0ParseTableElement:
     class ElementType:
         SHIFT = "SHIFT"
         REDUCE = "REDUCE"
-        GOTO =" GOTO"
+        GOTO = "GOTO"
+        ACCEPT = "ACCEPT"
 
-    def __init__(self, element_type, stateOrProductionRUle):
+    # for reduction
+    def __init__(self, element_type, productionRUle):
         self.element_type = element_type
-        if element_type == self.ElementType.SHIFT or element_type == self.ElementType.GOTO:
-            self.state_number = stateOrProductionRUle
-            self.reduction_productionRule = None
-        elif element_type == self.ElementType.REDUCE:
-            self.state_number = None
-            self.reduction_productionRule = stateOrProductionRUle
-        else:
-            raise ValueError("Invalid element type")
+        self.reductionProductionRule = productionRUle
+
+    # shifting and goto
+    def __init__(self, elementType, stateNumber):
+        self.element_type = elementType
+        self.stateNumber = stateNumber
+
+    # accepting state only  
+    def __init__(self, elementType):
+        assert elementType == self.ElementType.ACCEPT
+        self.element_type = elementType
         
     def __str__(self):
         if self.element_type == self.ElementType.REDUCE:
@@ -23,4 +28,6 @@ class LR0ParseTableElement:
             return "S: " + str(self.state_number)
         elif self.element_type == self.ElementType.GOTO:
             return "GOTO: " + str(self.state_number)
+        elif self.element_type == self.ElementType.ACCEPT:
+            return "Accept"
         return "NULL"

@@ -26,10 +26,22 @@ class State:
             if item.isReductionItem():
                 result.add(item)
         return result
+    
+    def isAcceptingState(self):
+        if self.isReducingState():
+            itemsWhichAreReducing = self.getItemsWhichAreReducingItems()
+            if len(itemsWhichAreReducing) > 1:
+                return False
+            
+            item = next(iter(itemsWhichAreReducing))
+
+            return item.isAcceptingItem()
         
-    def idReducingState(self):
+        return False
+
+    def isReducingState(self):
         reduction_items = self.getItemsWhichAreReducingItems()
-        return not reduction_items
+        return not reduction_items == 0
         # checks if the set is empty
 
     def __eq__(self, other) -> bool:

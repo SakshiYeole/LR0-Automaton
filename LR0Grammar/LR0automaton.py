@@ -18,7 +18,6 @@ import os
 import sys
 import copy
 from pathlib import Path
-from enum import Enum
 import shutil
 import subprocess
 from collections import deque
@@ -30,8 +29,8 @@ from model import state
 from model import Grammar
 from model import LR0parseTableElement
 
-class LR0Grammar(Grammar):
-
+class LR0Grammar(Grammar.Grammar):
+    end_of_line = "$"
     def __init__(self):
         super().__init__()
         self.transitions = {}
@@ -43,6 +42,7 @@ class LR0Grammar(Grammar):
         firstSymbol = super().getFirstSymbol()
         newNameForFirstSymbol = super().findNewName(firstSymbol)
         rightOfItem = [firstSymbol]
+        rightOfItem.append(self.end_of_line)
         return item.Item(newNameForFirstSymbol, rightOfItem, item.itemType.new_item)
     
     def findInitialItemSet(self):
@@ -89,85 +89,116 @@ class LR0Grammar(Grammar):
     def computeIndexingOfStates(self):
         index = 0
         self.stateIndexing[self.initialState] = index
-        index += 1
+        index = index + 1
 
         for fromState, transitions in self.transitions.items():
             if fromState not in self.stateIndexing:
                 self.stateIndexing[fromState] = index
-                index += 1
-
+                # index += 1
+                index = index + 1
+                
             for transitionString, toState in transitions.items():
                 if toState not in self.stateIndexing:
                     self.stateIndexing[toState] = index
-                    index =+ 1
+                    # index += 1
+                    index = index + 1
+                    
+    def getStateFromIndex(self, index):
+        for state, integer in self.stateIndexing.items():
+            if index == integer:
+                return state
+        return None
+    
+    # for Reducing
+    def addToParsetable(self, state_number, production_rule, transition_string):
+        self.parseTable[state_number][transition_string]= LR0parseTableElement(LR0parseTableElement.LR0ParseTableElement.ElementType.REDUCE, production_rule)
+
+    # accepting
+    def addToParseTable(self, state_number, transition_string):
+        self.parseTable[state_number][transition_string] = LR0parseTableElement(LR0parseTableElement.LR0ParseTableElement.ElementType.ACCEPT)
+
+    # for shifting and goto
+    def addToParseTable(self, state_number, shift_state_number, transition_string, element_type):
+        self.parseTable[state_number][transition_string] = LR0parseTableElement(element_type, shift_state_number)
+
+    def parseTableIsNonEmptyForStateAndTransitionString(self, state_number, transition_string):
+        return transition_string in self.parseTable[state_number]
+
     def createEmptyParsingTable(self):
         for i in range(len(self.stateIndexing)):
             map = {}
             self.parseTable.append(map)
     
-    def addToParsetableReduce(self, state_number, production_rule, transition_string):
-        self.parseTable[state_number][transition_string]= LR0parseTableElement("REDUCE", production_rule)
+    def computeParsingTable(self):
+        if not self.transitions:
+            print("Compute the transitions before running this function")
+            sys.exit(-1)
 
-    def addToParseTableShiftGoto(self, state_number, shift_state_number, transition_string, element_type):
-        self.parseTable[state_number][transition_string] = LR0parseTableElement(element_type, state_number)
+        self.createEmptyParsingTable()
 
-    def parseTableIsNonEmptyForStateAndTransitionString(self, state_number, transition_string):
-        return transition_string in self.parseTable[state_number]
+        for i in range(len(self.stateIndexing)):
+            from_state = self.getStateFromIndex(i)
+            from_state_int = i
 
-    # def computeParsingTable(self):
-    #     if not self.transitions:
-    #         print("Compute teh transitions before runnimg tis function")
-    #         sys.exit(-1)
+            # check if it is accepting
+            if from_state.isAcceptingState():
+                for terminal in super().getTerminalSymbols():
+                    self.addToParseTable(from_state_int, terminal)
 
-    #     self.createEmptyParsingTable()
+                continue
 
-    #     for from_state, transition_map in self.transitions.items():
-    #         from_state_int = self.stateIndexing[from_state]
+            # check if the fromstate is a reducing state
+            if from_state.isReducingState():
+                reducing_items = from_state.getItemsWhichAreReducingItems()
+                if len(reducing_items) > 1:
+                    # reduce-reduce conflict
+                    print("Reduce - Reduce conflict: ", reducing_items)
+                    sys.exit(-1)
 
-    #         # check if teh fromstate is a reducing state
-    #         if from_state.isReducingState():
-    #             reducing_items = from_state.getItemsWhichAreReducingItems()
-    #             if len(reducing_items) > 1:
-    #                 # reduce-reduce conflict
-    #                 print("Reduce - Reduce conflict: ", reducing_items)
-    #                 sys.exit(-1)
+                reducing_item = next(iter(reducing_items))
+                productionrule_foritem = reducing_item.getCorrespondingProductionRuleForReducingItem()
 
-    #             reducing_item = next(iter(reducing_items))
-    #             productionrule_foritem = reducing_item.getgetCorrespondingProductionRuleForReducingItem()
+                # for all terminal symbols, reduction
+                for terminal in super().getTerminalSymbols():
+                    self.addToParseTable(from_state_int, productionrule_foritem, terminal)
+                continue
 
-    #             # for all terminal symbols, reduction
-    #             for terminal in super().get
+            for transition_string, to_state in self.transitions[from_state].items():
+                to_state_int = self.stateIndexing[to_state]
 
-    def indexingStates(self):
-        result = {}
-        index = 0
+                if self.parseTableIsNonEmptyForStateAndTransitionString(from_state_int, transition_string):
+                    # shift-reduce conflict
+                    print("Shift - Reduce conflict: ", from_state_int, " state and symbol ", transition_string)
+                    sys.exit(-1)
 
-        for from_state, transition_map in self.transitions.items():
-            if from_state not in result:
-                result[from_state] = index
-                index += 1
+                if super().isTerminalSymbol(transition_string):
+                    # shift
+                    self.addToParseTable(from_state_int, to_state_int, transition_string, LR0parseTableElement.LR0ParseTableElement.ElementType.SHIFT)
+                elif super().isNonterminalSymbol(transition_string):
+                    # goto
+                    self.addToParseTable(from_state_int, to_state_int, transition_string, LR0parseTableElement.LR0ParseTableElement.ElementType.GOTO)
 
-            for to_state in transition_map.values():
-                if to_state not in result:
-                    result[to_state] = index
-                    index += 1
-        
-        print("Total States: ", len(result))
-        print("Indexing of maps: ")
-        for state, index in result.items():
-            print(f"{index} :- ")
-            print(state)
 
-        return result
+    def printIndexingOfStates(self):
+        if not self.stateIndexing:
+            print("Compute the indexing before running this function")
+            sys.exit(-1)
+
+        print("Total States: ", len(self.stateIndexing))
+        print("Indexing of states: ")
+        for state, value in self.stateIndexing.items():
+            print(f"{value} :-\n{state} ")
     
     def printTransitions(self):
-        stateIndexing = self.indexingStates()
+        if not self.stateIndexing:
+            print("Compute the indexing before running this function")
+            sys.exit(-1)
 
         for from_state, transition_map in self.transitions.items():
-            from_state_index = stateIndexing[from_state]
+            from_state_index = self.stateIndexing[from_state]
 
             for transition_string, to_state in transition_map.items():
-                to_state_index = stateIndexing[to_state]
+                to_state_index = self.stateIndexing[to_state]
 
                 print("From State: ", from_state_index)
                 print("Transition String: ", transition_string)
@@ -175,29 +206,38 @@ class LR0Grammar(Grammar):
                 print()
         
         print()
-        
-class ReadingInput:
-    def readInputFromFile(path):
-        with open(path, 'r') as file:
-            grammar = Grammar()
-            startSymbol = file.readline().strip()
-            grammar.setFirstSymbol(startSymbol)
 
-            nonTerminalString = file.readline().strip()
-            nonTeminals = nonTerminalString.split()
-            grammar.addAllNonTerminalSymbolFromIterator(nonTeminals)
+    def findLengthOfMaxTableElement(self):
+        max_length = float('-inf')
 
-            terminalString = file.readline().strip()
-            terminals = terminalString.split()
-            grammar.addAllTerminalSymbolFromIterator(terminals)
+        for map_elem in self.parseTable:
+            for element in map_elem.values():
+                max_length = max(max_length, len(str(element)))
 
-            for line in file:
-                input_line = line.strip()
-                if not input_line:
-                    continue
-                grammar.addRule(input_line)
+        return max_length
+            
+# class ReadingInput:
+#     def readInputFromFile(path):
+#         with open(path, 'r') as file:
+#             grammar = Grammar()
+#             startSymbol = file.readline().strip()
+#             grammar.setFirstSymbol(startSymbol)
 
-        return grammar
+#             nonTerminalString = file.readline().strip()
+#             nonTeminals = nonTerminalString.split()
+#             grammar.addAllNonTerminalSymbolFromIterator(nonTeminals)
+
+#             terminalString = file.readline().strip()
+#             terminals = terminalString.split()
+#             grammar.addAllTerminalSymbolFromIterator(terminals)
+
+#             for line in file:
+#                 input_line = line.strip()
+#                 if not input_line:
+#                     continue
+#                 grammar.addRule(input_line)
+
+#         return grammar
 
 def main():
 
@@ -216,15 +256,20 @@ def main():
     t.addTerminalSymbol(")")
     t.addTerminalSymbol("F")
 
-    # t.addRule("E' -> E")
+    t.addRule("E' -> E")
     t.addRule("E -> E + T | T")
     t.addRule("T -> T * F | F")
     t.addRule("F -> ( E ) | id")
 
     t.printGrammar()
 
+
     t.computeTransitions()
+    t.computeIndexingOfStates()
+    t.printIndexingOfStates()
     t.printTransitions()
+    # t.computeParsingTable()
+    
 
 if __name__ == "__main__":
     main()

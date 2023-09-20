@@ -9,6 +9,7 @@ class itemType:
 
 class Item:
     dotMarker = '\u2022'
+    end_of_line = "$"
     # isreduction, 
 
     def __init__(self, LHS, RHS, item_type):
@@ -20,6 +21,14 @@ class Item:
     def isReductionItem(self):
         return self.RHS.index(self.dotMarker)==(len(self.RHS)-1)
     
+    def isAcceptingItem(self):
+        if self.isReductionItem():
+            if len(self.RHS) > 2:
+                secondLastSymbol = self.RHS[len(self.RHS) - 2]
+                return secondLastSymbol.__eq__(self.end_of_line)
+            
+        return False
+
     def getSymbolNextToDotMarker(self):
         if self.isReductionItem():
             return None
@@ -31,18 +40,19 @@ class Item:
         production_rule.addRHS(self.RHS)
         return production_rule
     
-    def movingDotMarkerInItemAndReturn(self):
+    def movingDotMarkerInItemAndReturn(self): #good yaar
         if self.isReductionItem():
             print("Is a Reduction Item")
             return None
         newRHS = copy.deepcopy(self.RHS)
-        indexOfDotMarker = self.RHS.index(self.dotMarker)
-        self.RHS.remove(self.dotMarker)
-        self.RHS.insert(indexOfDotMarker + 1, self.dotMarker)
+        indexOfDotMarker = newRHS.index(self.dotMarker)
+        newRHS.remove(self.dotMarker)
+        newRHS.insert(indexOfDotMarker + 1, self.dotMarker)
         return Item(self.LHS, newRHS, itemType.derived_item)
     
     def closure(self, production_rules):
-        closure_item = {self}
+        closure_item = set()
+        closure_item.add(self)
         addedNew = True
         while addedNew:
             addedNew = False
