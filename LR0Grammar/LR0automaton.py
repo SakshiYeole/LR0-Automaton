@@ -23,12 +23,12 @@ import shutil
 import subprocess
 from collections import deque
 
-# sys.path.append('E:\Acads\Semester 7\CD\Lab\lab6\model')
+sys.path.append('E:\Acads\Semester 7\CD\Lab\lab6\model')
 from model import productionRule as pr
 from model import item
 from model import state
 from model import Grammar
-from model import LR0ParseTableElement
+from model import LR0parseTableElement
 
 class LR0Grammar(Grammar):
 
@@ -36,11 +36,12 @@ class LR0Grammar(Grammar):
         super().__init__()
         self.transitions = {}
         self.initialState = None
+        self.parseTable = []
+        self.stateIndexing = {}
 
     def findInitialItem(self):
         firstSymbol = super().getFirstSymbol()
         newNameForFirstSymbol = super().findNewName(firstSymbol)
-
         rightOfItem = [firstSymbol]
         return item.Item(newNameForFirstSymbol, rightOfItem, item.itemType.new_item)
     
@@ -84,6 +85,58 @@ class LR0Grammar(Grammar):
                 newstate = state.State(non_closure_items_for_new_state, super().getProductionRules())
                 new_states_created.append(newstate)
                 self.addToTransitions(curr_state, transitionString, newstate)
+
+    def computeIndexingOfStates(self):
+        index = 0
+        self.stateIndexing[self.initialState] = index
+        index += 1
+
+        for fromState, transitions in self.transitions.items():
+            if fromState not in self.stateIndexing:
+                self.stateIndexing[fromState] = index
+                index += 1
+
+            for transitionString, toState in transitions.items():
+                if toState not in self.stateIndexing:
+                    self.stateIndexing[toState] = index
+                    index =+ 1
+    def createEmptyParsingTable(self):
+        for i in range(len(self.stateIndexing)):
+            map = {}
+            self.parseTable.append(map)
+    
+    def addToParsetableReduce(self, state_number, production_rule, transition_string):
+        self.parseTable[state_number][transition_string]= LR0parseTableElement("REDUCE", production_rule)
+
+    def addToParseTableShiftGoto(self, state_number, shift_state_number, transition_string, element_type):
+        self.parseTable[state_number][transition_string] = LR0parseTableElement(element_type, state_number)
+
+    def parseTableIsNonEmptyForStateAndTransitionString(self, state_number, transition_string):
+        return transition_string in self.parseTable[state_number]
+
+    # def computeParsingTable(self):
+    #     if not self.transitions:
+    #         print("Compute teh transitions before runnimg tis function")
+    #         sys.exit(-1)
+
+    #     self.createEmptyParsingTable()
+
+    #     for from_state, transition_map in self.transitions.items():
+    #         from_state_int = self.stateIndexing[from_state]
+
+    #         # check if teh fromstate is a reducing state
+    #         if from_state.isReducingState():
+    #             reducing_items = from_state.getItemsWhichAreReducingItems()
+    #             if len(reducing_items) > 1:
+    #                 # reduce-reduce conflict
+    #                 print("Reduce - Reduce conflict: ", reducing_items)
+    #                 sys.exit(-1)
+
+    #             reducing_item = next(iter(reducing_items))
+    #             productionrule_foritem = reducing_item.getgetCorrespondingProductionRuleForReducingItem()
+
+    #             # for all terminal symbols, reduction
+    #             for terminal in super().get
 
     def indexingStates(self):
         result = {}
