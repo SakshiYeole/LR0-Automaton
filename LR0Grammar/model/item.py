@@ -37,7 +37,9 @@ class Item:
     
     def getCorrespondingProductionRuleForReducingItem(self):
         production_rule = ProductionRule.ProductionRule(self.LHS)
-        production_rule.addRHS(self.RHS)
+        right = copy.deepcopy(self.RHS)
+        right.remove(self.dotMarker)
+        production_rule.addRHS(right)
         return production_rule
     
     def movingDotMarkerInItemAndReturn(self): #good yaar
