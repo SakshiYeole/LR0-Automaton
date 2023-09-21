@@ -1,0 +1,49 @@
+Following are the Transitions: 
+From State: 0
+Transition String: D
+To State: 0
+
+From State: 0
+Transition String: var
+To State: 0
+
+From State: 1
+Transition String: $
+To State: 1
+
+From State: 2
+Transition String: ['id']
+To State: 2
+
+From State: 2
+Transition String: L
+To State: 2
+
+From State: 5
+Transition String: ,
+To State: 5
+
+From State: 5
+Transition String: :
+To State: 5
+
+From State: 6
+Transition String: id
+To State: 6
+
+From State: 7
+Transition String: integer
+To State: 7
+
+From State: 7
+Transition String: T
+To State: 7
+
+From State: 7
+Transition String: ['real']
+To State: 7
+
+From State: 10
+Transition String: ;
+To State: 10
+

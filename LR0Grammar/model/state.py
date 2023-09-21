@@ -33,9 +33,12 @@ class State:
             if len(itemsWhichAreReducing) > 1:
                 return False
             
-            item = next(iter(itemsWhichAreReducing))
+            try: 
+                item = next(iter(itemsWhichAreReducing))
+                return item.isAcceptingItem()
+            except StopIteration:
+                pass
 
-            return item.isAcceptingItem()
         
         return False
 

@@ -33,7 +33,7 @@ class Item:
         if self.isReductionItem():
             return None
         indexOfDotMarker = self.RHS.index(self.dotMarker)
-        return self.RHS[indexOfDotMarker + 1]
+        return str(self.RHS[indexOfDotMarker + 1])
     
     def getCorrespondingProductionRuleForReducingItem(self):
         production_rule = ProductionRule.ProductionRule(self.LHS)
@@ -87,7 +87,9 @@ class Item:
         return  f"{self.LHS} -> {self.RHS} "
     
     def __hash__(self) -> int:
-        return hash((self.LHS, tuple(self.RHS)))
+        temp = str(self.LHS)
+        temp += ''.join(str(i) for i in self.RHS)
+        return hash(tuple(temp))
     
 def main():
     dotMarker = '\u2022'
@@ -103,7 +105,7 @@ def main():
 
     closure = set()
     closure = i.closure(t.getProductionRules())
-    for i in  closure:
+    for i in closure:
         print(i)
 
 if __name__ == "__main__":

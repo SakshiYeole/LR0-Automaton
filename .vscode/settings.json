@@ -1,0 +1,9 @@
+{
+    "python.analysis.extraPaths": [
+        "./helperFunction",
+        "./LR0Grammar",
+        "./visualization",
+        "./LR0Grammar/model",
+        "./constants"
+    ]
+}

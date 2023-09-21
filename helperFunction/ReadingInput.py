@@ -1,11 +1,12 @@
 import sys
-sys.path.append('E:\Acads\Semester 7\CD\Lab\lab6\LR0Grammar\model')
-from LR0Grammar.model import Grammar
+path = os.getcwd()
+sys.path.append(path + '\..\LR0Grammar')
+from LR0Grammar import LR0automaton
 
 class ReadingInput:
     def readInputFromFile(path):
         with open(path, 'r') as file:
-            grammar = Grammar.Grammar()
+            grammar = LR0automaton.LR0Grammar()
             startSymbol = file.readline().strip()
             grammar.setFirstSymbol(startSymbol)
 
