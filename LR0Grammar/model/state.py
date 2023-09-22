@@ -1,5 +1,10 @@
 import copy
-
+# import sys
+# import os
+# path = os.getcwd() + '\..\\'
+# print(path)
+# # sys.exit(-1)
+# sys.path.append(path)
 from model import Grammar as g
 from model import item
 
@@ -44,7 +49,7 @@ class State:
 
     def isReducingState(self):
         reduction_items = self.getItemsWhichAreReducingItems()
-        return not reduction_items == 0
+        return len(reduction_items) != 0
         # checks if the set is empty
 
     def __eq__(self, other) -> bool:
@@ -66,40 +71,61 @@ class State:
 def main():
     dotMarker = '\u2022'
     t = g.Grammar()
-    t.addRule("E' -> E")
-    t.addRule("E -> E + T | T")
-    t.addRule("T -> T * F | F")
-    t.addRule("F -> ( E ) | id")
+    # t.addRule("E' -> E")
+    # t.addRule("E -> E + T | T")
+    # t.addRule("T -> T * F | F")
+    # t.addRule("F -> ( E ) | id")
+    # t.printGrammar()
+
+    t.addTerminalSymbol("+")
+    t.addTerminalSymbol("-")
+    t.addTerminalSymbol("(")
+    t.addTerminalSymbol(")")
+    t.addTerminalSymbol("id")
+    t.addNonterminalSymbol("E")
+    t.addNonterminalSymbol("T")
+    t.addRule("E -> E + T | E - T | T")
+    t.addRule("T -> ( E ) | id")
     t.printGrammar()
-
-    t = g.Grammar()
+    
+    
     right = []
-    right.append("(")
-    right.append(dotMarker)
     right.append("E")
-    right.append(")")
-    i = item.Item("F", right, item.itemType.derived_item)
-    print(f"Item: {i}")
+    right.append("+")
+    right.append("$")
+    right.append(dotMarker)
+    i = item.Item("S", right, item.itemType.derived_item)
+    s = set()
+    s.add(i)
+    state = State(s, t.getProductionRules())
+    print(state)
+    print(state.isAcceptingState())
+    print(state.isReducingState())
+    #     print("\n\nItem:\t{}\n".format(item.__repr__()))  
+    # i = item.Item("F", right, item.itemType.derived_item)
+    # print(f"Item: {i}")
 
-    closure = set()
-    closure = i.closure(t.getProductionRules())
-    for i in  closure:
-        print(i)
+    # closure = set()
+    # closure = i.closure(t.getProductionRules())
+    # for i in  closure:
+    #     print(i)
 
-    inititemset = set()
-    inititemset.add(i)
+    # inititemset = set()
+    # inititemset.add(i)
 
-    s1 = State(inititemset, t.getProductionRules())
-    print(s1)
-    s2 = State(inititemset, t.getProductionRules())
-    print(s2)
+    # s1 = State(inititemset, t.getProductionRules())
+    # print(s1)
+    # s2 = State(inititemset, t.getProductionRules())
+    # print(s2)
 
-    print(s1==s2)
+    # print(s1==s2)
 
-    states = set()
-    states.add(s1)
-    states.add(s2)
-    print(f"states size: {len(states)}")
+    # states = set()
+    # states.add(s1)
+    # states.add(s2)
+    # print(f"states size: {len(states)}")
+    # t = item()
+
 
 if __name__ == "__main__":
     main()

@@ -19,7 +19,9 @@ class Item:
             self.RHS.insert(0, self.dotMarker)
 
     def isReductionItem(self):
-        return self.RHS.index(self.dotMarker)==(len(self.RHS)-1)
+        if self.RHS:
+            return self.RHS[len(self.RHS)-1]==self.dotMarker
+        return False
     
     def isAcceptingItem(self):
         if self.isReductionItem():

@@ -107,19 +107,23 @@ class LR0Grammar(Grammar.Grammar):
                 return state
         return None
 
-    # for Reducing
-    def addToParsetable(self, state_number, production_rule, transition_string):
+    def addToParseTable(self, state_number, shift_state_number, production_rule, transition_string, element_type):
         self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(
-            LR0parseTableElement.LR0ParseTableElement.ElementType.REDUCE, production_rule, None)
+            element_type, production_rule, shift_state_number)
 
-    # accepting
-    def addToParseTable(self, state_number, transition_string):
-        self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(
-            LR0parseTableElement.LR0ParseTableElement.ElementType.ACCEPT, None, None)
+    # # for Reducing
+    # def addToParsetable(self, state_number, production_rule, transition_string):
+    #     self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(
+    #         LR0parseTableElement.LR0ParseTableElement.ElementType.REDUCE, production_rule, None)
 
-    # for shifting and goto
-    def addToParseTable(self, state_number, shift_state_number, transition_string, element_type):
-        self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(element_type, None, shift_state_number)
+    # # accepting
+    # def addToParseTable(self, state_number, transition_string):
+    #     self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(
+    #         LR0parseTableElement.LR0ParseTableElement.ElementType.ACCEPT, None, None)
+
+    # # for shifting and goto
+    # def addToParseTable(self, state_number, shift_state_number, transition_string, element_type):
+    #     self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(element_type, None, shift_state_number)
 
     def parseTableIsNonEmptyForStateAndTransitionString(self, state_number, transition_string):
         return transition_string in self.parseTable[state_number]
@@ -143,7 +147,7 @@ class LR0Grammar(Grammar.Grammar):
             # check if it is accepting
             if from_state.isAcceptingState():
                 for terminal in super().getTerminalSymbols():
-                    self.addToParseTable(from_state_int, terminal, None, None)
+                    self.addToParseTable(from_state_int, None, None, terminal, LR0parseTableElement.LR0ParseTableElement.ElementType.ACCEPT)
 
                 continue
 
@@ -160,7 +164,7 @@ class LR0Grammar(Grammar.Grammar):
 
                     # for all terminal symbols, reduction
                     for terminal in super().getTerminalSymbols():
-                        self.addToParseTable(from_state_int, productionrule_foritem, terminal, None)
+                        self.addToParseTable(from_state_int, None, productionrule_foritem, terminal, LR0parseTableElement.LR0ParseTableElement.ElementType.REDUCE)
                     continue
                 except StopIteration:
                     pass
@@ -175,10 +179,10 @@ class LR0Grammar(Grammar.Grammar):
 
                 if super().isTerminalSymbol(transition_string):
                     # shift
-                    self.addToParseTable(from_state_int, to_state_int, transition_string, LR0parseTableElement.LR0ParseTableElement.ElementType.SHIFT)
+                    self.addToParseTable(from_state_int, to_state_int, None, transition_string, LR0parseTableElement.LR0ParseTableElement.ElementType.SHIFT)
                 elif super().isNonterminalSymbol(transition_string):
                     # goto
-                    self.addToParseTable(from_state_int, to_state_int, transition_string, LR0parseTableElement.LR0ParseTableElement.ElementType.GOTO)
+                    self.addToParseTable(from_state_int, to_state_int, None, transition_string, LR0parseTableElement.LR0ParseTableElement.ElementType.GOTO)
 
     def printIndexingOfStates(self):
         if not self.stateIndexing:
