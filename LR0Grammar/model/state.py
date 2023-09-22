@@ -1,10 +1,4 @@
 import copy
-# import sys
-# import os
-# path = os.getcwd() + '\..\\'
-# print(path)
-# # sys.exit(-1)
-# sys.path.append(path)
 from model import Grammar as g
 from model import item
 

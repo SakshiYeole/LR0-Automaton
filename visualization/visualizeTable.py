@@ -1,7 +1,5 @@
 import pandas as pd
 from tabulate import tabulate
-import os
-import sys
 
 def convertData(data, header_symbols):
     dict = {}
@@ -20,7 +18,6 @@ def convertData(data, header_symbols):
     return dict
     
 def visualizeTable(map, header_symbols):
-    # Create a DataFrame from the data
     data = convertData(map, header_symbols)
     df = pd.DataFrame(data)
 
@@ -31,8 +28,6 @@ def visualizeTableToFile(map, path, header_symbols):
     data = convertData(map, header_symbols)
     df = pd.DataFrame(data)
     table = tabulate(df, headers='keys', tablefmt='grid')
-    
-    # print(table)
     with open(path, 'w') as file:
         file.write(table)
 

@@ -4,22 +4,15 @@ import os
 from pathlib import Path
 
 path = os.getcwd()
-# sys.path.append(path)
-# # print(path)
-# # sys.exit(-1)
 sys.path.append(path + '\constants')
 sys.path.append(path + '\helperFunction')
 sys.path.append(path + '\LR0Grammar')
 sys.path.append(path + '\model')
 sys.path.append(path + '\\visualization')
-# print(sys.path)
 from constants import StringConstants
 from helperFunction import ReadingInput
 from LR0Grammar import LR0automaton
 from visualization import visualizeTable
-
-
-# sys.exit(-1)
 
 class Main:
     homeDirectory = Path.cwd()

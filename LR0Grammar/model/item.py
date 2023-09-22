@@ -10,7 +10,6 @@ class itemType:
 class Item:
     dotMarker = '\u2022'
     end_of_line = "$"
-    # isreduction, 
 
     def __init__(self, LHS, RHS, item_type):
         self.LHS = LHS
@@ -44,7 +43,7 @@ class Item:
         production_rule.addRHS(right)
         return production_rule
     
-    def movingDotMarkerInItemAndReturn(self): #good yaar
+    def movingDotMarkerInItemAndReturn(self): 
         if self.isReductionItem():
             print("Is a Reduction Item")
             return None

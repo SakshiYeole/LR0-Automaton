@@ -20,16 +20,6 @@ class LR0ParseTableElement:
             assert element_type == self.ElementType.ACCEPT
             self.element_type = element_type
 
-    # # shifting and goto
-    # def __init__(self, elementType, stateNumber):
-    #     self.element_type = elementType
-    #     self.stateNumber = stateNumber
-
-    # # accepting state only  
-    # def __init__(self, elementType):
-    #     assert elementType == self.ElementType.ACCEPT
-    #     self.element_type = elementType
-
     def __str__(self):
         if self.element_type == self.ElementType.REDUCE:
             assert self.reduction_production_rule is not None

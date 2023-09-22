@@ -6,23 +6,15 @@ from collections import deque
 from visualization import visualizeTable
 
 path = os.getcwd() + '\LR0Grammar'
-# print(path)
 sys.path.append(path + '\model')
 sys.path.append(path + '\..\constants')
 sys.path.append(path + '\..\\visualization')
-# print(sys.path)
-# sys.exit(-1)
 from constants import StringConstants
 from model import item
 from model import state
 from model import Grammar
 from model import LR0parseTableElement
 
-
-# from visualization import visualizeTable
-
-
-# sys.exit(-1)
 class LR0Grammar(Grammar.Grammar):
     end_of_line = "$"
 
@@ -110,20 +102,6 @@ class LR0Grammar(Grammar.Grammar):
     def addToParseTable(self, state_number, shift_state_number, production_rule, transition_string, element_type):
         self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(
             element_type, production_rule, shift_state_number)
-
-    # # for Reducing
-    # def addToParsetable(self, state_number, production_rule, transition_string):
-    #     self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(
-    #         LR0parseTableElement.LR0ParseTableElement.ElementType.REDUCE, production_rule, None)
-
-    # # accepting
-    # def addToParseTable(self, state_number, transition_string):
-    #     self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(
-    #         LR0parseTableElement.LR0ParseTableElement.ElementType.ACCEPT, None, None)
-
-    # # for shifting and goto
-    # def addToParseTable(self, state_number, shift_state_number, transition_string, element_type):
-    #     self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(element_type, None, shift_state_number)
 
     def parseTableIsNonEmptyForStateAndTransitionString(self, state_number, transition_string):
         return transition_string in self.parseTable[state_number]
