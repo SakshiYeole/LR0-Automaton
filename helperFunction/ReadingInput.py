@@ -21,6 +21,7 @@ class ReadingInput:
 
             for line in file:
                 input_line = line.strip()
+                input_line = input_line.replace('Îµ', "ε")
                 if not input_line:
                     continue
                 grammar.addRule(input_line)
