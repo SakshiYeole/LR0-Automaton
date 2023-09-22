@@ -1,7 +1,0 @@
-Input Grammar
-Set of Terminal Symbols: ['$', 'id', ':', ';', ',', 'var', 'integer', 'real']
-Set of Non-Terminal Symbols: ['D', 'T', 'L']
-Rules in the given Grammar: 
-D -> [['var', 'L', ':', 'T', ';']] 
-T -> [['integer'], [['real']]] 
-L -> [['L', ',', 'id'], [['id']]] 

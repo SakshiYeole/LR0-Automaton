@@ -1,23 +1,9 @@
-# the final output DFA must be a list of states, where each item in list a dictionary
-# 1st key is the items matched to dictionary of production rules(each prodcution rule is a dict with items as strings and key as teh LHS of prodcution rule) in that state.
-# 2nd key is transition matched to dictionary of transitions from that state to some other state on the key element
-# states = [
-#     {'items': ['S -> .E', 'E -> .E + T', 'E -> .T', 'T -> .T*F', 'T -> .F'], 'transitions': {'E': 1}},        # 0
-#     {'items': ['S -> E.'], 'transitions': {}},              # 1
-#     {'items': ['E -> .E+T', 'E -> .T'], 'transitions': {'E': 3, 'T': 2}}, #2
-#     {'items': ['E -> E.+T'], 'transitions': {'T': 4}},      # 3
-#     {'items': ['E -> E+.T'], 'transitions': {'T': 5}},      # 4
-#     {'items': ['T -> .T*F', 'T -> .F'], 'transitions': {'T': 6, 'F': 7}},   # 5
-#     {'items': ['T -> T.*F'], 'transitions': {'F': 8}},         # 6
-#     {'items': ['F -> .(E)', 'F -> .id'], 'transitions': {'E': 9, 'id': 10}},    # 7
-#     {'items': ['F -> (E.)'], 'transitions': {}},            # 8
-#     {'items': ['E -> E+.T.'], 'transitions': {}},    # 9
-#     {'items': ['T -> T.*F.'], 'transitions': {}},           # 10
-# ]
 import sys
 import os
 import copy
 from collections import deque
+
+from visualization import visualizeTable
 
 path = os.getcwd() + '\LR0Grammar'
 # print(path)
@@ -26,12 +12,14 @@ sys.path.append(path + '\..\constants')
 sys.path.append(path + '\..\\visualization')
 # print(sys.path)
 # sys.exit(-1)
-import StringConstants
-import item
-import state
-import Grammar
-import LR0parseTableElement
-import visualizeTable
+from constants import StringConstants
+from model import item
+from model import state
+from model import Grammar
+from model import LR0parseTableElement
+
+
+# from visualization import visualizeTable
 
 
 # sys.exit(-1)
@@ -131,8 +119,7 @@ class LR0Grammar(Grammar.Grammar):
 
     # for shifting and goto
     def addToParseTable(self, state_number, shift_state_number, transition_string, element_type):
-        self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(element_type, None,
-                                                                                                     shift_state_number)
+        self.parseTable[state_number][transition_string] = LR0parseTableElement.LR0ParseTableElement(element_type, None, shift_state_number)
 
     def parseTableIsNonEmptyForStateAndTransitionString(self, state_number, transition_string):
         return transition_string in self.parseTable[state_number]
@@ -188,12 +175,10 @@ class LR0Grammar(Grammar.Grammar):
 
                 if super().isTerminalSymbol(transition_string):
                     # shift
-                    self.addToParseTable(from_state_int, to_state_int, transition_string,
-                                         LR0parseTableElement.LR0ParseTableElement.ElementType.SHIFT)
+                    self.addToParseTable(from_state_int, to_state_int, transition_string, LR0parseTableElement.LR0ParseTableElement.ElementType.SHIFT)
                 elif super().isNonterminalSymbol(transition_string):
                     # goto
-                    self.addToParseTable(from_state_int, to_state_int, transition_string,
-                                         LR0parseTableElement.LR0ParseTableElement.ElementType.GOTO)
+                    self.addToParseTable(from_state_int, to_state_int, transition_string, LR0parseTableElement.LR0ParseTableElement.ElementType.GOTO)
 
     def printIndexingOfStates(self):
         if not self.stateIndexing:
@@ -205,8 +190,8 @@ class LR0Grammar(Grammar.Grammar):
         for state, value in self.stateIndexing.items():
             print(f"{value} :-\n{state} ")
 
-    def printIndexingOfStatesToFile(self, path):
-        with open(path, 'w') as writer:
+    def printIndexingOfStatesToFile(self, path_to_file):
+        with open(path_to_file, 'w') as writer:
             if not self.stateIndexing:
                 writer.write("Compute the indexing before running this function\n")
                 sys.exit(-1)
@@ -251,7 +236,7 @@ class LR0Grammar(Grammar.Grammar):
                 from_state = self.stateIndexing[state]
 
                 for transition_string, to_state in transition_map.items():
-                    to_state_value = self.stateIndexing[state]
+                    to_state_value = self.stateIndexing[to_state]
 
                     str_to_write += "From State: " + str(from_state) + "\n"
                     str_to_write += "Transition String: " + transition_string + "\n"
@@ -260,11 +245,17 @@ class LR0Grammar(Grammar.Grammar):
 
             writer.write(str_to_write)
 
-    def printParsingTableToFile(self, path):
-        visualizeTable.visualizeTableToFile(self.parseTable, path)
+    def print_parsing_table_to_file(self, path_to_file):
+        header_symbols1 = []
+        header_symbols1 = super().getTerminalSymbols()         # ACTION
+        header_symbols1.extend(super().getNonTerminalSymbols())#GOTO
+        visualizeTable.visualizeTableToFile(self.parseTable, path_to_file, header_symbols1)
 
     def printParsingTable(self):
-        visualizeTable.visualizeTable(self.parseTable)
+        header_symbols2 = []
+        header_symbols2 = super().getTerminalSymbols()         # ACTION
+        header_symbols2.extend(super().getNonTerminalSymbols())#GOTO
+        visualizeTable.visualizeTable(self.parseTable, header_symbols2)
 
     def findLengthOfMaxTableElement(self):
         max_length = float('-inf')
@@ -301,14 +292,15 @@ def main():
 
     t.compute_transitions()
     t.computeIndexingOfStates()
-    t.printIndexingOfStates()
-    t.printTransitions()
+    # t.printIndexingOfStates()
+    # t.printTransitions()
     t.computeParsingTable()
-    # # print(t.parseTable)
+    # print(t.parseTable)
     for i in t.parseTable:
-        # for key, value in i.items():
-        print(len(i))
-        # print()
+        for key, value in i.items():
+            print(f"{key} {value}", end=" ")
+        print()
+        print()
 
 
 if __name__ == "__main__":

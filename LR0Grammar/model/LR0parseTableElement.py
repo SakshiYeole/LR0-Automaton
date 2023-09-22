@@ -5,14 +5,18 @@ class LR0ParseTableElement:
         GOTO = "GOTO"
         ACCEPT = "ACCEPT"
 
-    def __init__(self, element_type, productionRUle, stateNumber):
-        if stateNumber == None:
+    def __init__(self, element_type, reduction_production_rule, state_number):
+
+        self.element_type = element_type
+        self.reduction_production_rule = reduction_production_rule
+        self.state_number = state_number
+        if state_number is None:  # Reduce
             self.element_type = element_type
-            self.reductionProductionRule = productionRUle
-        elif productionRUle == None:
+            self.reduction_production_rule = reduction_production_rule
+        elif reduction_production_rule is None:  # Shift and Goto
             self.element_type = element_type
-            self.stateNumber = stateNumber
-        elif productionRUle == None and stateNumber == None:
+            self.stateNumber = state_number
+        elif reduction_production_rule is None and state_number is None:  # Accept
             assert element_type == self.ElementType.ACCEPT
             self.element_type = element_type
 
@@ -25,22 +29,24 @@ class LR0ParseTableElement:
     # def __init__(self, elementType):
     #     assert elementType == self.ElementType.ACCEPT
     #     self.element_type = elementType
-        
+
     def __str__(self):
         if self.element_type == self.ElementType.REDUCE:
-            assert self.reduction_productionRule is not None
-            return "Reduce: "+ str(self.reduction_productionRule)
+            assert self.reduction_production_rule is not None
+            return f"Reduce: {str(self.reduction_production_rule)}"
         elif self.element_type == self.ElementType.SHIFT:
-            return "Shift: " + str(self.stateNumber)
+            return f"Shift: {str(self.state_number)}"
         elif self.element_type == self.ElementType.GOTO:
-            return "GOTO: " + str(self.stateNumber)
+            return f"GOTO: {str(self.state_number)}"
         elif self.element_type == self.ElementType.ACCEPT:
-            return "Accept"
+            return f"Accept"
         return "NULL"
-    
+
+
 def main():
-    e = LR0ParseTableElement(LR0ParseTableElement.ElementType.SHIFT, None, 7)
+    e = LR0ParseTableElement(LR0ParseTableElement.ElementType.REDUCE, 'abc', 4)
     print(e)
+
 
 if __name__ == "__main__":
     main()

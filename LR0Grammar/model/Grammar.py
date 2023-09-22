@@ -1,36 +1,37 @@
 from model import productionRule as pr
-
+import copy
 import os
 
-class Grammar:                   
+
+class Grammar:
     epsilon = '\u03B5'
     end_of_line = "$"
     firstSymbol = ""
 
-    def __init__(self) -> None:         #Tested
-        self.production_rule = []           #list of ProductionRule
+    def __init__(self) -> None:  # Tested
+        self.production_rule = []  # list of ProductionRule
         self.terminal_symbols = []
         self.non_terminal_symbols = []
         self.terminal_symbols.append(self.end_of_line)
         self.firstSet = {}
-        self.followSet = {}   
+        self.followSet = {}
 
-    def __str__(self) -> str:           # Tested
+    def __str__(self) -> str:  # Tested
         s = ""
         for i in self.production_rule:
             s += i.__str__()
         return s
 
-    def getFirstSymbol(self):           # Tested
+    def getFirstSymbol(self):  # Tested
         return self.firstSymbol
-    
-    def setFirstSymbol(self, firstSymbol):      # Tested
+
+    def setFirstSymbol(self, firstSymbol):  # Tested
         self.firstSymbol = firstSymbol
 
-    def getProductionRules(self):           # Tested
+    def getProductionRules(self):  # Tested
         return self.production_rule
-    
-    def getProductionRulesBasedOnNonTerminal(self, symbol):     # Tested
+
+    def getProductionRulesBasedOnNonTerminal(self, symbol):  # Tested
         rule = pr.ProductionRule(symbol)
         if rule in self.production_rule:
             index = self.production_rule.index(rule)
@@ -38,7 +39,7 @@ class Grammar:
         else:
             return None
 
-    def addRuleList(self, LHS, RHS):           # Tested
+    def addRuleList(self, LHS, RHS):  # Tested
         alreadyExistingRule = self.getProductionRulesBasedOnNonTerminal(LHS)
 
         if alreadyExistingRule is None:
@@ -48,7 +49,7 @@ class Grammar:
         else:
             alreadyExistingRule.addRHS(RHS)
 
-    def addRule(self, input):               # Tested
+    def addRule(self, input):  # Tested
         rulesplit = input.split("->")
         left_side = rulesplit[0]
         left_side = left_side.strip()
@@ -61,51 +62,51 @@ class Grammar:
             rightfinal.append(symbols)
         self.addRuleList(left_side, rightfinal)
 
-    def getTerminalSymbols(self):           # Tested
-        return self.terminal_symbols
-    
-    def getNonTerminalSymbols(self):        # Tested
-        return self.non_terminal_symbols
-    
-    def addAllTerminalSymbolFromIterator(self, iterator):       # Tested
+    def getTerminalSymbols(self):  # Tested
+        return copy.deepcopy(self.terminal_symbols)
+
+    def getNonTerminalSymbols(self):  # Tested
+        return copy.deepcopy(self.non_terminal_symbols)
+
+    def addAllTerminalSymbolFromIterator(self, iterator):  # Tested
         for symbol in iterator:
             self.addTerminalSymbol(symbol)
 
-    def addAllNonTerminalSymbolFromIterator(self, iterator):    # Tested
+    def addAllNonTerminalSymbolFromIterator(self, iterator):  # Tested
         for symbol in iterator:
             self.addNonterminalSymbol(symbol)
-        
-    def addTerminalSymbol(self, str):            # Tested
-        if str not in self.terminal_symbols:              
+
+    def addTerminalSymbol(self, str):  # Tested
+        if str not in self.terminal_symbols:
             self.terminal_symbols.append(str)
 
-    def addNonterminalSymbol(self, str):                # Tested
+    def addNonterminalSymbol(self, str):  # Tested
         self.non_terminal_symbols.append(str)
-    
-    def isTerminalSymbol(self, str):            # Tested
+
+    def isTerminalSymbol(self, str):  # Tested
         if str not in self.terminal_symbols:
             return False
         return True
-    
-    def isNonterminalSymbol(self, str):         # Tested
+
+    def isNonterminalSymbol(self, str):  # Tested
         if str not in self.non_terminal_symbols:
             return False
         return True
-    
-    def findNewName(self, LHS):             # Tested
+
+    def findNewName(self, LHS):  # Tested
         new_name = LHS + "'"
         notunique = True
-        while(notunique):
-            notunique  = False
+        while (notunique):
+            notunique = False
             for r in self.production_rule:
                 if r.__eq__(pr.ProductionRule(new_name)):
                     new_name += "'"
                     notunique = True
-        
+
         # self.non_terminal_symbols.append(new_name)
         return new_name
-    
-    def printGrammar(self):             # Tested
+
+    def printGrammar(self):  # Tested
         print("Set of terminal symbols: {}".format(str(self.terminal_symbols)))
         print("Set of non_terminal symbols: {}".format(str(self.non_terminal_symbols)))
         print("Rules of Grammar: ")
@@ -123,4 +124,3 @@ class Grammar:
 
             for productionRule in self.production_rule:
                 writer.write(str(productionRule) + "\n")
-    

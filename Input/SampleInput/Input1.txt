@@ -1,0 +1,8 @@
+D
+D T L
+id : ; , var integer real
+D -> var L : T ;
+T -> integer
+T -> real
+L -> L , id
+L -> id

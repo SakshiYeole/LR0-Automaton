@@ -1,4 +1,5 @@
 import sys
+import os
 path = os.getcwd()
 sys.path.append(path + '\..\LR0Grammar')
 from LR0Grammar import LR0automaton
