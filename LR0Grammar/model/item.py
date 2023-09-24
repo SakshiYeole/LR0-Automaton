@@ -10,10 +10,12 @@ class itemType:
 class Item:
     dotMarker = '\u2022'
     end_of_line = "$"
+    epsilon = '\u03B5'
 
     def __init__(self, LHS, RHS, item_type):
         self.LHS = LHS
         self.RHS = copy.deepcopy(RHS)
+        self.RHs.remove(self.epsilon)
         if item_type == itemType.new_item:
             self.RHS.insert(0, self.dotMarker)
 
